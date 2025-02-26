@@ -90,4 +90,10 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
+
+    implementation(libs.androidx.viewpager2)
+    implementation (libs.material)
+
+    implementation(libs.androidx.recyclerview)
+
 }
