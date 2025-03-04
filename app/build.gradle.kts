@@ -91,9 +91,17 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
 
 
+    // viewpager2
     implementation(libs.androidx.viewpager2)
+
+    // material ui kit
     implementation (libs.material)
 
+    // recyclerview
     implementation(libs.androidx.recyclerview)
+
+    // Retrofit for making API requests
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
 
 }

@@ -17,7 +17,7 @@ class DashboardFragment : Fragment() {
     private lateinit var viewPager2: ViewPager2
     private lateinit var adapter: ViewPagerFragmentAdapter
 
-    private val labels = arrayOf("Destinations", "Weather", "Map")
+    private val labels = arrayOf("Destinations", "Weather", "Map","Gallery")
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
