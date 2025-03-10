@@ -15,7 +15,7 @@ class ImagePagerAdapter(private val imageResIds: List<Int>) : RecyclerView.Adapt
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_image, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_images_viewpager, parent, false)
         return ImageViewHolder(view)
     }
 
