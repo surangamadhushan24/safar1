@@ -17,6 +17,7 @@ retrofit = "2.9.0"
 roomRuntime = "2.6.1" # Use the latest stable version
 ksp = "1.9.0-1.0.13" # Add KSP version
 coroutines = "1.7.3" # Add coroutines version
+secretsGradlePlugin = "2.0.1"
 viewpager2 = "1.1.0"
 
 [libraries]
@@ -42,6 +43,7 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" } # Add coroutines core
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" } # Add coroutines Android
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

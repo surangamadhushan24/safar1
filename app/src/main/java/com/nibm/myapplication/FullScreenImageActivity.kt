@@ -1,22 +1,27 @@
 package com.nibm.myapplication
 
-
-
 import android.net.Uri
 import android.os.Bundle
-import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-
+import com.nibm.myapplication.databinding.ActivityFullscreenImageBinding
 
 class FullScreenImageActivity : AppCompatActivity() {
 
-    private val imageViewFull: ImageView = findViewById(R.id.imageView)
+    private lateinit var binding: ActivityFullscreenImageBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_fullscreen_image)
 
+        // Initialize View Binding
+        binding = ActivityFullscreenImageBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        // Retrieve Image URI
         val imageUri = intent.getStringExtra("image_uri")
-        imageViewFull.setImageURI(Uri.parse(imageUri))
+
+        // Load the image if the URI is valid
+        imageUri?.let {
+            binding.imageViewFull.setImageURI(Uri.parse(it))
+        }
     }
 }

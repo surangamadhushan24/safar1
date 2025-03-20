@@ -1,8 +1,19 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.devtools.ksp")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
+
+// Load API key from local.properties before defining android{}
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+val openWeatherMapApiKey = localProperties.getProperty("OPENWEATHERMAP_API_KEY", "")
 
 android {
     namespace = "com.nibm.myapplication"
@@ -16,6 +27,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Add API key to BuildConfig
+        buildConfigField("String", "OPENWEATHERMAP_API_KEY", "\"${project.findProperty("OPENWEATHERMAP_API_KEY") ?: openWeatherMapApiKey}\"")
     }
 
     buildTypes {
@@ -27,40 +41,23 @@ android {
             )
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
+
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
 dependencies {
-
-//    implementation(libs.androidx.core.ktx)
-//    implementation(libs.androidx.appcompat)
-//    implementation(libs.material)
-//    implementation(libs.androidx.activity)
-//    implementation(libs.androidx.constraintlayout)
-//    testImplementation(libs.junit)
-//    androidTestImplementation(libs.androidx.junit)
-//    androidTestImplementation(libs.androidx.espresso.core)
-//
-//    implementation( libs.androidx.room.runtime)
-////    ksp(libs.androidx.room.compiler.v250)
-//    ksp(libs.androidx.room.compiler)
-//    implementation (libs.androidx.lifecycle.viewmodel.ktx)
-//    implementation (libs.androidx.lifecycle.livedata.ktx)
-//    implementation (libs.androidx.navigation.fragment.ktx)
-//    implementation (libs.androidx.navigation.ui.ktx)
-//    implementation (libs.androidx.databinding.runtime)
-
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -72,8 +69,8 @@ dependencies {
 
     // Room dependencies
     implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx) // Add room-ktx for coroutine support
-    ksp(libs.androidx.room.compiler) // Use KSP for Room
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 
     // Lifecycle dependencies
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
@@ -90,18 +87,19 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
-
-    // viewpager2
+    // ViewPager2
     implementation(libs.androidx.viewpager2)
 
-    // material ui kit
-    implementation (libs.material)
-
-    // recyclerview
+    // RecyclerView
     implementation(libs.androidx.recyclerview)
 
-    // Retrofit for making API requests
-    implementation (libs.retrofit)
-    implementation (libs.converter.gson)
+    // Retrofit for API requests
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 
+    // Google Maps SDK
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+
+    // Glide for image loading
+    implementation("com.github.bumptech.glide:glide:4.15.1")
 }

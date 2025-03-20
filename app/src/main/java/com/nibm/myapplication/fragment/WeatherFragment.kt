@@ -4,77 +4,91 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+
+import android.widget.SearchView
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.nibm.myapplication.R
-import com.nibm.myapplication.apiservices.WeatherApiService
+import com.nibm.myapplication.adapter.ForecastAdapter
+import com.nibm.myapplication.apiservices.WeatherService
 import com.nibm.myapplication.repository.WeatherRepository
 import com.nibm.myapplication.viewModel.WeatherViewModel
 import com.nibm.myapplication.viewModel.WeatherViewModelFactory
-import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class WeatherFragment : Fragment() {
 
     private lateinit var viewModel: WeatherViewModel
-    private lateinit var etCity: EditText
-    private lateinit var btnGetWeather: Button
-    private lateinit var progressBar: ProgressBar
-    private lateinit var tvWeatherCondition: TextView
-    private lateinit var tvTemperature: TextView
-    private lateinit var tvCityName: TextView
-
-    private val API_KEY = "" // Replace with your OpenWeatherMap API key
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_weather, container, false)
-    }
+        val view = inflater.inflate(R.layout.fragment_weather, container, false)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        // Create Retrofit instance
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://api.openweathermap.org/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
 
-        // Initialize UI elements
-        etCity = view.findViewById(R.id.etCity)
-        btnGetWeather = view.findViewById(R.id.btnGetWeather)
-        progressBar = view.findViewById(R.id.progressBar)
-        tvWeatherCondition = view.findViewById(R.id.tvWeatherCondition)
-        tvTemperature = view.findViewById(R.id.tvTemperature)
-        tvCityName = view.findViewById(R.id.tvCityName)
+        // Create WeatherService instance
+        val weatherService = retrofit.create(WeatherService::class.java)
 
-        // Initialize ViewModel
-        val apiService = WeatherApiService.create()
-        val repository = WeatherRepository(apiService)
-        viewModel = ViewModelProvider(this, WeatherViewModelFactory(repository))
-            .get(WeatherViewModel::class.java)
+        // Create repository manually
+        val repository = WeatherRepository(weatherService)
 
-        btnGetWeather.setOnClickListener {
-            val city = etCity.text.toString().trim()
-            if (city.isNotEmpty()) {
-                fetchWeather(city)
-            } else {
-                Toast.makeText(requireContext(), "Please enter a city name", Toast.LENGTH_SHORT).show()
+        // Initialize ViewModel with Factory
+        viewModel = ViewModelProvider(this, WeatherViewModelFactory(repository)).get(
+            WeatherViewModel::class.java)
+
+        // Set up SearchView
+        val searchView = view.findViewById<SearchView>(R.id.searchView)
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                query?.let { viewModel.searchCity(it) }
+                return false
             }
-        }
-    }
 
-    private fun fetchWeather(city: String) {
-        progressBar.visibility = View.VISIBLE
-
-        lifecycleScope.launch {
-            val weather = viewModel.fetchWeather(city, API_KEY).value
-            progressBar.visibility = View.GONE
-
-            if (weather != null) {
-                tvCityName.text = "City: $city"
-                tvTemperature.text = "Temperature: ${weather.main.temp}°C"
-                tvWeatherCondition.text = "Condition: ${weather.weather[0].description}"
-            } else {
-                Toast.makeText(requireContext(), "Failed to fetch weather", Toast.LENGTH_SHORT).show()
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
             }
+        })
+
+        // Observe current weather data
+        viewModel.weatherData.observe(viewLifecycleOwner) { weatherResponse ->
+            view.findViewById<TextView>(R.id.cityName).text = weatherResponse.name
+            view.findViewById<TextView>(R.id.temperature).text = "Temperature: ${weatherResponse.main.temp}°C"
+            view.findViewById<TextView>(R.id.weatherDescription).text = "Weather: ${weatherResponse.weather[0].description}"
+            view.findViewById<TextView>(R.id.humidity).text = "Humidity: ${weatherResponse.main.humidity}%"
+
+            // Load weather icon
+            val iconUrl = "https://openweathermap.org/img/wn/${weatherResponse.weather[0].icon}@2x.png"
+            Glide.with(this).load(iconUrl).into(view.findViewById(R.id.weatherIcon))
         }
+
+        // Observe forecast data
+        val forecastRecyclerView = view.findViewById<RecyclerView>(R.id.forecastRecyclerView)
+        forecastRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        viewModel.forecastData.observe(viewLifecycleOwner) { forecastResponse ->
+            val forecastList = forecastResponse.list
+            val adapter = ForecastAdapter(forecastList)
+            forecastRecyclerView.adapter = adapter
+        }
+
+        // Observe error messages
+        viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
+            view.findViewById<TextView>(R.id.errorMessage).text = errorMessage
+        }
+
+        viewModel.searchCity("Matara")
+
+        return view
     }
 }

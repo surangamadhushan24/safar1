@@ -2,14 +2,19 @@ package com.nibm.myapplication.fragment
 
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.Manifest
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -26,6 +31,7 @@ class GalleryFragment : Fragment() {
 
     private val REQUEST_CAMERA = 1
     private val REQUEST_GALLERY = 2
+    private val CAMERA_PERMISSION_CODE = 100
     private var photoUri: Uri? = null
     private val imageList = mutableListOf<Uri>()
     private lateinit var imageAdapter: ImageAdapter
@@ -53,8 +59,22 @@ class GalleryFragment : Fragment() {
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
         recyclerView.adapter = imageAdapter
 
-        btnCamera.setOnClickListener { openCamera() }
+        btnCamera.setOnClickListener { checkCameraPermission() }
         btnGallery.setOnClickListener { openGallery() }
+    }
+
+    private fun checkCameraPermission() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(Manifest.permission.CAMERA),
+                CAMERA_PERMISSION_CODE
+            )
+        } else {
+            openCamera()
+        }
     }
 
     private fun openCamera() {
@@ -67,7 +87,11 @@ class GalleryFragment : Fragment() {
                 null
             }
             photoFile?.also {
-                photoUri = FileProvider.getUriForFile(requireContext(), "com.nibm.myapplication.fileprovider", it)
+                photoUri = FileProvider.getUriForFile(
+                    requireContext(),
+                    "com.nibm.myapplication.fileprovider",
+                    it
+                )
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
                 startActivityForResult(intent, REQUEST_CAMERA)
             }
@@ -76,7 +100,7 @@ class GalleryFragment : Fragment() {
 
     private fun createImageFile(): File {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val storageDir = requireContext().getExternalFilesDir(null)
+        val storageDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile("IMG_${timeStamp}_", ".jpg", storageDir)
     }
 
@@ -102,6 +126,17 @@ class GalleryFragment : Fragment() {
                         imageAdapter.notifyDataSetChanged()
                     }
                 }
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == CAMERA_PERMISSION_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openCamera()
+            } else {
+                Toast.makeText(requireContext(), "Camera permission denied", Toast.LENGTH_SHORT).show()
             }
         }
     }
