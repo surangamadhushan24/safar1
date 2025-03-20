@@ -9,9 +9,9 @@
     android:padding="16dp"
     tools:context=".DestinationDetailActivity">
 
-    <!-- ViewPager2 for Images (Top of the Screen) -->
 
-    <!-- Destination Name (Centered) -->
+
+
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="376dp"
@@ -23,7 +23,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Destination Description (Centered) -->
+
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/textViewName"
         android:layout_width="0dp"

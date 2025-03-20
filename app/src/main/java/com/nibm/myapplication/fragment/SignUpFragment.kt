@@ -37,7 +37,7 @@ class SignUpFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_sign_up, container, false)
 
-        // Initialize Views
+
         usernameLayout = view.findViewById(R.id.usernameLayout)
         passwordLayout = view.findViewById(R.id.passwordLayout)
         countryLayout = view.findViewById(R.id.countryLayout)
@@ -48,11 +48,11 @@ class SignUpFragment : Fragment() {
         etTel = view.findViewById(R.id.etTel)
         btnSignUp = view.findViewById(R.id.btnSignUp)
 
-        // Get database instance and DAO
+
         val database = AppDatabase.getDatabase(requireContext())
         val repository = UserRepository(database.userDao())
 
-        // Initialize ViewModel with Factory
+
         viewModel = ViewModelProvider(this, UserViewModel.provideFactory(repository))
             .get(UserViewModel::class.java)
 
@@ -79,7 +79,7 @@ class SignUpFragment : Fragment() {
             usernameLayout.error = null
         }
 
-        // Validate Password
+
         if (password.isEmpty()) {
             passwordLayout.error = "Password is required"
             isValid = false
@@ -90,7 +90,7 @@ class SignUpFragment : Fragment() {
             passwordLayout.error = null
         }
 
-        // Validate Country
+
         if (country.isEmpty()) {
             countryLayout.error = "Country is required"
             isValid = false
@@ -98,7 +98,7 @@ class SignUpFragment : Fragment() {
             countryLayout.error = null
         }
 
-        // Validate Telephone
+
         if (tel.isEmpty()) {
             telLayout.error = "Telephone is required"
             isValid = false
@@ -109,7 +109,7 @@ class SignUpFragment : Fragment() {
             telLayout.error = null
         }
 
-        // If all fields are valid, proceed with sign-up
+
         if (isValid) {
             val user = User(
                 username = username,
@@ -118,13 +118,13 @@ class SignUpFragment : Fragment() {
                 tel = tel
             )
 
-            // Insert user into the database
+
             viewModel.insert(user)
 
-            // Show success message
+
             Toast.makeText(requireContext(), "Sign up successful!", Toast.LENGTH_SHORT).show()
 
-            // Navigate to SignInFragment
+
             findNavController().navigate(R.id.action_signUpFragment_to_signInFragment)
         }
     }

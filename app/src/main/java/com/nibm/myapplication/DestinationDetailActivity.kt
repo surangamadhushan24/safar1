@@ -19,16 +19,16 @@ class DestinationDetailActivity : AppCompatActivity() {
         binding = ActivityDestinationDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Get data from the intent
+
         val name = intent.getStringExtra("name")
         val description = intent.getStringExtra("description")
         val imageResIds = intent.getIntegerArrayListExtra("imageResIds") ?: ArrayList()
 
-        // Set data to the views
+
         binding.textViewName.text = name
         binding.textViewDescription.text = description
 
-        // Set up ViewPager2
+
         viewPager = binding.viewPager
         imageAdapter = ImagePagerAdapter(imageResIds)
         viewPager.adapter = imageAdapter

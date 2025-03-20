@@ -31,23 +31,23 @@ class WeatherFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_weather, container, false)
 
-        // Create Retrofit instance
+
         val retrofit = Retrofit.Builder()
             .baseUrl("https://api.openweathermap.org/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-        // Create WeatherService instance
+
         val weatherService = retrofit.create(WeatherService::class.java)
 
-        // Create repository manually
+
         val repository = WeatherRepository(weatherService)
 
-        // Initialize ViewModel with Factory
+
         viewModel = ViewModelProvider(this, WeatherViewModelFactory(repository)).get(
             WeatherViewModel::class.java)
 
-        // Set up SearchView
+
         val searchView = view.findViewById<SearchView>(R.id.searchView)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -60,14 +60,14 @@ class WeatherFragment : Fragment() {
             }
         })
 
-        // Observe current weather data
+
         viewModel.weatherData.observe(viewLifecycleOwner) { weatherResponse ->
             view.findViewById<TextView>(R.id.cityName).text = weatherResponse.name
             view.findViewById<TextView>(R.id.temperature).text = "Temperature: ${weatherResponse.main.temp}°C"
             view.findViewById<TextView>(R.id.weatherDescription).text = "Weather: ${weatherResponse.weather[0].description}"
             view.findViewById<TextView>(R.id.humidity).text = "Humidity: ${weatherResponse.main.humidity}%"
 
-            // Load weather icon
+
             val iconUrl = "https://openweathermap.org/img/wn/${weatherResponse.weather[0].icon}@2x.png"
             Glide.with(this).load(iconUrl).into(view.findViewById(R.id.weatherIcon))
         }
@@ -82,7 +82,7 @@ class WeatherFragment : Fragment() {
             forecastRecyclerView.adapter = adapter
         }
 
-        // Observe error messages
+
         viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
             view.findViewById<TextView>(R.id.errorMessage).text = errorMessage
         }

@@ -6,7 +6,7 @@ import retrofit2.http.Query
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-// Base URL for OpenWeatherMap API
+
 const val BASE_URL = "https://api.openweathermap.org/data/2.5/"
 
 interface WeatherApiService {
